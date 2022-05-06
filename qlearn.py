@@ -9,18 +9,18 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 
-environment = gym.make("FrozenLake-v1", is_slippery=True)
+environment = gym.make("FrozenLake-v1", is_slippery=False)
 environment.reset()
 
 # We re-initialize the Q-table
 qtable = np.zeros((environment.observation_space.n, environment.action_space.n))
 
 # Hyperparameters
-episodes = 1000        # Total number of episodes
-alpha = 0.5            # Learning rate
+episodes = 12000        # Total number of episodes
+alpha = 0.3            # Learning rate
 gamma = 0.9            # Discount factor
 epsilon = 1.0          # Amount of randomness in the action selection
-epsilon_decay = 0.001  # Fixed amount to decrease
+epsilon_decay = 0.0001  # Fixed amount to decrease
 
 # List of outcomes to plot
 outcomes = []
