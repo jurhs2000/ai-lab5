@@ -4,23 +4,27 @@
 # Julio Herrera 19402
 # Juan Pablo Pineda 19087
 
+# Referencia: Maxime Labonne - Q-learning for begginers -  https://towardsdatascience.com/q-learning-for-beginners-2837b777741
+
 import gym
-import random
 import numpy as np
 import matplotlib.pyplot as plt
 
+# FrozenLake-v0 deprecated
+# is_slippery => True will move in intended direction with 1/3 probability and 1/3 probability in perpendicular direction
+# is_slippery => False will move with 100% probability in intended direction
 environment = gym.make("FrozenLake-v1", is_slippery=False)
 environment.reset()
 
-# We re-initialize the Q-table
+# initialize the Q-table with zeros
 qtable = np.zeros((environment.observation_space.n, environment.action_space.n))
 
 # Hyperparameters
-episodes = 12000        # Total number of episodes
+episodes = 12000       # Total number of episodes
 alpha = 0.3            # Learning rate
 gamma = 0.9            # Discount factor
 epsilon = 1.0          # Amount of randomness in the action selection
-epsilon_decay = 0.0001  # Fixed amount to decrease
+epsilon_decay = 0.0001 # Fixed amount to decrease
 
 # List of outcomes to plot
 outcomes = []
@@ -30,6 +34,7 @@ print(qtable)
 
 # Training
 for _ in range(episodes):
+    # Reset the environment on each episode
     state = environment.reset()
     done = False
 
@@ -42,19 +47,19 @@ for _ in range(episodes):
         rnd = np.random.random()
 
         # If random number < epsilon, take a random action
-        if rnd < epsilon:
+        if rnd < epsilon: # empieza con alta probabilidad y luego decrece epsilon_decay en cada episode
           action = environment.action_space.sample()
         # Else, take the action with the highest value in the current state
         else:
           action = np.argmax(qtable[state])
-             
+
         # Implement this action and move the agent in the desired direction
         new_state, reward, done, info = environment.step(action)
 
         # Update Q(s,a)
         qtable[state, action] = qtable[state, action] + \
                                 alpha * (reward + gamma * np.max(qtable[new_state]) - qtable[state, action])
-        
+
         # Update our current state
         state = new_state
 
@@ -63,7 +68,7 @@ for _ in range(episodes):
           outcomes[-1] = "Success"
 
     # Update epsilon
-    epsilon = max(epsilon - epsilon_decay, 0)
+    epsilon = max(epsilon - epsilon_decay, 0) # => epsilon - (epsilon_decay * episodes) es el epsilon final
 
 print()
 print('===========================================')
@@ -79,10 +84,11 @@ ax.set_facecolor('#efeeea')
 plt.bar(range(len(outcomes)), outcomes, color="#0A047A", width=1.0)
 plt.show()
 
+# Evaluation
+
 episodes = 100
 nb_success = 0
 
-# Evaluation
 for _ in range(100):
     state = environment.reset()
     done = False
